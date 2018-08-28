@@ -5,3 +5,12 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+Role.create!([
+  {category: 'Maintenance', sub_category: 'add user', url: '/new/user'},
+  {category: 'Maintenance', sub_category: 'edit user', url: '/user//edit'},
+  {category: 'Account', sub_category: 'change password', url: '/change-my-pasword'}
+])
+
+User.create!([
+  { email: 'marnieparaiso@gmail.com', password: 'test', designation: 'admin', role: '1,2,3' }
+])

@@ -1,13 +1,56 @@
 Types::QueryType = GraphQL::ObjectType.define do
-  name "Query"
-  # Add root-level fields here.
-  # They will be entry points for queries on your schema.
+  name 'Query'
 
-  # TODO: remove me
-  field :testField, types.String do
-    description "An example field added by the generator"
-    resolve ->(obj, args, ctx) {
-      "Hello World!"
+  field :myProfile, function: Resolvers::MyProfile.new
+
+  field :roles, types[Types::RoleType] do
+    resolve ->(_obj, _args, ctx) {
+      if ctx[:current_user] != 'Invalid Access Token.'
+        Role.all
+      end
+    }
+  end
+
+  field :user, Types::UserType do
+    argument :id, !types.ID
+    resolve ->(_obj, args, ctx) {
+      if ctx[:current_user] != 'Invalid Access Token.'
+        User.where(id: args[:id]).first
+      end
+    }
+  end
+
+  connection :usersConnection, Types::UserType.connection_type do
+    resolve ->(_obj, args, ctx) {
+      if ctx[:current_user] != 'Invalid Access Token.'
+        User.all
+      end
+    }
+  end
+
+  field :users, types[Types::UserType] do
+    resolve ->(_obj, args, ctx) {
+      if ctx[:current_user] != 'Invalid Access Token.'
+        User.all
+      end
+    }
+  end
+
+  field :search_users, types[Types::UserType] do
+    argument :email, types.String
+    argument :designation, types.String
+    resolve ->(_obj, args, ctx) {
+      if ctx[:current_user] != 'Invalid Access Token.'
+        User.where("email ilike '#{args[:email]}%' and designation ilike '#{args[:designation]}'")
+      end
+    }
+  end
+
+  field :designations, types[Types::DesignationType] do
+    resolve ->(_obj, args, ctx) {
+      if ctx[:current_user] != 'Invalid Access Token.'
+        User.all.select(:designation).group(:designation).order(:designation)
+      end
     }
   end
 end
